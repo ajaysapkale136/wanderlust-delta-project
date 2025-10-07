@@ -35,9 +35,9 @@ main()
     });
     
 async function  main() {
-    await mongoose.connect(dbUrl);
+    await mongoose.connect(dbUrl,
       minTlsVersion: 'tls12', 
-}    
+)};    
 
 // app.get('/', (req, res) => {
 //     res.send("Hi, I am root");
