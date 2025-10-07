@@ -1,6 +1,6 @@
 if(process.env.NODE_ENV != 'production'){
-    require('dotenv').config();
-    // require('dotenv').config({ override: true });
+    require('dotenv').config();
+    // require('dotenv').config({ override: true });
 }
 
 const express = require('express');
@@ -27,25 +27,19 @@ const dbUrl = process.env.ATLASDB_URL;
 
 
 main()
-    .then(() => {
-        console.log("MongoDB connected");
-    })
-    .catch((err) => {
-        console.log("MongoDB Connection Error:", err); // Added context for error logging
-    });
-    
+    .then(() => {
+        console.log("MongoDB connected");
+    })
+    .catch((err) => {
+        console.log(err);
+    });
+    
 async function main() {
-    // 🔑 FIX ADDED HERE: Add minTlsVersion: 'tls12' to resolve SSL alert 80
-    await mongoose.connect(dbUrl, {
-        minTlsVersion: 'tls12', 
-        // These are commonly required options for modern connections:
-        // useNewUrlParser: true,
-        // useUnifiedTopology: true,
-    }); 
-}   
+    await mongoose.connect(dbUrl); // This is where the connection happens
+}   
 
 // app.get('/', (req, res) => {
-//     res.send("Hi, I am root");
+//     res.send("Hi, I am root");
 // });
 
 app.set('view engine', 'ejs');
@@ -56,41 +50,40 @@ app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, 'public')));
 
 const store = MongoStore.create({
-    mongoUrl: dbUrl,
-    crypto: {
-        secret:process.env.SECRET,
-    },
-    touchAfter: 24 * 3600,
+    mongoUrl: dbUrl,
+    crypto: {
+        secret:process.env.SECRET,
+    },
+    touchAfter: 24 * 3600,
 });
 
-store.on("error", (err) =>{ // Corrected store.on error handler to use 'err'
-    console.log("ERROR in MONGO SESSION STORE", err);
+store.on("error", () =>{
+    console.log("ERROR in MONGO SESSION STORE",err);
 })
 
 const sessionOptions = {
-    store,
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie:{
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
-        maxAge: 7 * 24 * 60 * 60 * 1000 ,// 7 days
-        httpOnly: true, // Helps prevent XSS attacks
-    },
+    store,
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie:{
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: 7 * 24 * 60 * 60 * 1000 ,// 7 days
+        httpOnly: true, // Helps prevent XSS attacks
+    },
 
 };
 
 const validateReview = (req, res, next) => {
-    console.log(req.body);
-    // Assuming reviewSchema is defined elsewhere
-    let {error} = reviewSchema.validate(req.body);
-    
-    if (error) {
-        let errMsg = error.details.map((el)=> el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }else{
-        next();
-    }  
+    console.log(req.body);
+    let {error} = reviewSchema.validate(req.body);
+    
+    if (error) {
+        let errMsg = error.details.map((el)=> el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }else{
+        next();
+    }  
 };
 
 
@@ -105,27 +98,27 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-    res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error');
-    res.locals.currUser = req.user;
-    next();
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    res.locals.currUser = req.user;
+    next();
 });
 
 
 app.use('/listings', listingsRouter);
-app.use('/listings/:id/reviews',reviewRouter); 
+app.use('/listings/:id/reviews',reviewRouter); 
 app.use('/', userRouter);
 
 
 app.all('*', (req, res, next) => {
-    next(new ExpressError(404, "Page Not Found !"));
+    next(new ExpressError(404, "Page Not Found !"));
 });
 
 app.use((err, req, res, next) => {
-    let { statusCode=500, message="Something went wrong!" } = err;
-    res.status(statusCode).render('error.ejs',{message} );
-   // res.status(statusCode).send(message);
+    let { statusCode=500, message="Something went wrong!" } = err;
+    res.status(statusCode).render('error.ejs',{message} );
+   // res.status(statusCode).send(message);
 });
 app.listen(8080, () => {
-    console.log("Server is running on port 8080");
+    console.log("Server is running on port 8080");
 });
