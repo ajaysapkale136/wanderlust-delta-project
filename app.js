@@ -36,6 +36,7 @@ main()
     
 async function  main() {
     await mongoose.connect(dbUrl);
+      minTlsVersion: 'tls12', 
 }    
 
 // app.get('/', (req, res) => {
