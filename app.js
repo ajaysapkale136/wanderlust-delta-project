@@ -47,32 +47,18 @@ app.use(methodOverride('_method'));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, 'public')));
 
-// const sessionOptions = {
-//     secret: 'mysupersecretcode',
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie:{
-//         expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
-//         maxAge: 7 * 24 * 60 * 60 * 1000 ,// 7 days
-//         httpOnly: true, // Helps prevent XSS attacks
-//     },
-
-// };
-
-
-
 const sessionOptions = {
-    store: MongoStore.create({ mongoUrl: process.env.ATLASDB_URL }),
     secret: 'mysupersecretcode',
     resave: false,
-    saveUninitialized: false, // safer for production
+    saveUninitialized: true,
     cookie:{
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxAge: 7 * 24 * 60 * 60 * 1000 ,// 7 days
         httpOnly: true, // Helps prevent XSS attacks
     },
+
 };
 
-app.use(session(sessionOptions));
 
 
 const validateReview = (req, res, next) => {
