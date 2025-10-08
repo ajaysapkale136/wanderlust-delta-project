@@ -25,19 +25,13 @@ const userRouter = require('./routes/user.js');
 
 const dbUrl = process.env.ATLASDB_URL;
 
+
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-
-
-main()
-    .then(() => {
-        console.log("MongoDB connected");
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+.then(() => console.log("MongoDB connected successfully!"))
+.catch(err => console.error("MongoDB connection error:", err));
     
 // async function main() {
 //     await mongoose.connect(dbUrl); // This is where the connection happens
