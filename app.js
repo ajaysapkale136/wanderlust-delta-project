@@ -59,7 +59,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // };
 
-const MongoStore = require('connect-mongo');
+
 
 const sessionOptions = {
     store: MongoStore.create({ mongoUrl: process.env.ATLASDB_URL }),
