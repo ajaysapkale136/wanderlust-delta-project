@@ -1,19 +1,18 @@
 {
-  "engines": {
-    "node": "22.15.0"
-  }, 
   "name": "majorproject",
   "version": "1.0.0",
-  "description": "",
+  "description": "Major project using Express, MongoDB, Cloudinary, and Mapbox.",
   "main": "app.js",
+  "type": "commonjs",
+  "engines": {
+    "node": "22.15.0"
+  },
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "patch-package"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "@mapbox/mapbox-sdk": "^0.16.1",
     "body-parser": "^2.2.0",
@@ -40,5 +39,8 @@
   },
   "devDependencies": {
     "patch-package": "^8.0.0"
-  }
+  },
+  "keywords": [],
+  "author": "Ajay Sapkale",
+  "license": "ISC"
 }
