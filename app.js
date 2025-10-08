@@ -25,6 +25,11 @@ const userRouter = require('./routes/user.js');
 
 const dbUrl = process.env.ATLASDB_URL;
 
+mongoose.connect(dbUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+
 
 main()
     .then(() => {
@@ -34,9 +39,9 @@ main()
         console.log(err);
     });
     
-async function main() {
-    await mongoose.connect(dbUrl); // This is where the connection happens
-}   
+// async function main() {
+//     await mongoose.connect(dbUrl); // This is where the connection happens
+// }   
 
 // app.get('/', (req, res) => {
 //     res.send("Hi, I am root");
