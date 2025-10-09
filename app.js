@@ -11,6 +11,7 @@ const methodOverride = require('method-override');
 const ejsMate = require('ejs-mate');
 const ExpressError = require('./utils/ExpressError.js');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');   // ✅ added
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -47,7 +48,21 @@ app.use(methodOverride('_method'));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ✅ create a Mongo-backed session store
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto: {
+        secret: 'mysupersecretcode',
+    },
+    touchAfter: 24 * 3600, // time period in seconds
+});
+
+store.on("error", (err) => {
+    console.log("ERROR in MONGO SESSION STORE", err);
+});
+
 const sessionOptions = {
+    store,   // ✅ use MongoStore instead of MemoryStore
     secret: 'mysupersecretcode',
     resave: false,
     saveUninitialized: true,
@@ -56,7 +71,6 @@ const sessionOptions = {
         maxAge: 7 * 24 * 60 * 60 * 1000 ,// 7 days
         httpOnly: true, // Helps prevent XSS attacks
     },
-
 };
 
 const validateReview = (req, res, next) => {
@@ -88,12 +102,9 @@ app.use((req, res, next) => {
     next();
 });
 
-
-
 app.use('/listings', listingsRouter);
 app.use('/listings/:id/reviews',reviewRouter); 
 app.use('/', userRouter);
-
 
 app.all('*', (req, res, next) => {
     next(new ExpressError(404, "Page Not Found !"));
@@ -102,8 +113,8 @@ app.all('*', (req, res, next) => {
 app.use((err, req, res, next) => {
     let { statusCode=500, message="Something went wrong!" } = err;
     res.status(statusCode).render('error.ejs',{message} );
-   
 });
+
 app.listen(8080, () => {
     console.log("Server is running on port 8080");
 });
