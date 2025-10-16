@@ -48,7 +48,7 @@ app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, 'public')));
 
 const sessionOptions = {
-    secret: process.env.SECRET,
+    secret: 'mysupersecretcode',
     resave: false,
     saveUninitialized: true,
     cookie:{
